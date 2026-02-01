@@ -1,0 +1,19 @@
+# Node
+node_modules/
+
+# Local data (server writes here)
+data.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*~
+
+# Logs
+*.log
+npm-debug.log*
