@@ -88,8 +88,8 @@ function saveDays(days) {
 }
 
 function postData() {
-  if (!useFileStorage) return;
-  fetch("/api/data", {
+  if (!useFileStorage) return Promise.resolve();
+  return fetch("/api/data", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ days: memory.days, settings: memory.settings, activeTimer: memory.activeTimer }),
@@ -97,9 +97,9 @@ function postData() {
 }
 
 function netlifySave() {
-  if (!useNetlifyStorage) return;
+  if (!useNetlifyStorage) return Promise.resolve();
   const url = window.location.origin + "/.netlify/functions/save-data";
-  fetch(url, {
+  return fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ days: memory.days, settings: memory.settings, activeTimer: memory.activeTimer }),
@@ -148,15 +148,14 @@ function saveSettings() {
   userBadge.textContent = userName;
   if (useFileStorage) {
     memory.settings = settings;
-    postData();
-    return;
+    return postData();
   }
   if (useNetlifyStorage) {
     memory.settings = settings;
-    netlifySave();
-    return;
+    return netlifySave();
   }
   localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
+  return Promise.resolve();
 }
 
 function getWipApiKey() {
@@ -494,9 +493,13 @@ istoricModal.addEventListener("cancel", () => istoricModal.close());
 btnSettings.addEventListener("click", () => settingsModal.showModal());
 if (btnSave) {
   btnSave.addEventListener("click", () => {
-    saveSettings();
-    settingsModal.close();
-    window.location.reload();
+    Promise.resolve(saveSettings()).then(() => {
+      settingsModal.close();
+      window.location.reload();
+    }).catch(() => {
+      settingsModal.close();
+      window.location.reload();
+    });
   });
 }
 modalClose.addEventListener("click", () => {
