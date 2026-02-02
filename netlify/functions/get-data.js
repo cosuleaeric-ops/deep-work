@@ -1,12 +1,22 @@
 const { getStore } = require("@netlify/blobs");
 
+const DEFAULT_PAYLOAD = { days: {}, settings: {}, activeTimer: null };
+
 exports.handler = async () => {
-  const store = getStore("deep-work-depot");
-  const data = await store.get("data", { type: "json" });
-  const payload = data || { days: {}, settings: {}, activeTimer: null };
-  return {
-    statusCode: 200,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  };
+  try {
+    const store = getStore("deep-work-depot");
+    const data = await store.get("data", { type: "json" });
+    const payload = data || DEFAULT_PAYLOAD;
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    };
+  } catch (err) {
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(DEFAULT_PAYLOAD),
+    };
+  }
 };

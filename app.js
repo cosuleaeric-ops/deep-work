@@ -97,7 +97,8 @@ function postData() {
 
 function netlifySave() {
   if (!useNetlifyStorage) return;
-  fetch("/.netlify/functions/save-data", {
+  const url = window.location.origin + "/.netlify/functions/save-data";
+  fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ days: memory.days, settings: memory.settings, activeTimer: memory.activeTimer }),
@@ -507,8 +508,9 @@ if (btnImport && inputImport) {
 
 // --- Init: Netlify Blobs → server local → localStorage
 async function init() {
+  const netlifyUrl = window.location.origin + "/.netlify/functions/get-data";
   try {
-    const netlifyR = await fetch("/.netlify/functions/get-data");
+    const netlifyR = await fetch(netlifyUrl);
     if (netlifyR.ok) {
       const data = await netlifyR.json();
       memory.days = data.days || {};

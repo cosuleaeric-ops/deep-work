@@ -52,10 +52,17 @@ git push -u origin main
 ### 2. Deploy pe Netlify
 
 1. Mergi la [netlify.com](https://www.netlify.com) și autentifică-te (cu GitHub).
-2. **Add new site** → **Import an existing project** → **GitHub** și alege repo-ul `deep-work-depot`.
-3. Setări build:
-   - **Build command:** lasă gol (site static).
-   - **Publish directory:** `.` (sau `/`).
+2. **Add new site** → **Import an existing project** → **GitHub** și alege repo-ul.
+3. Setări build (sau lasă netlify.toml din repo să le seteze):
+   - **Build command:** `npm install`
+   - **Publish directory:** `.`
 4. **Deploy site**.
 
-Netlify va servi direct `index.html`, `app.js` și `styles.css`. În browser datele vor fi stocate în **localStorage** (fără server Node). Postarea pe WIP funcționează din browser dacă ai setat API key-ul în Setări.
+Pe Netlify, datele se salvează în **Netlify Blobs** (persistente chiar dacă ștergi cache-ul). Postarea pe WIP funcționează din browser dacă ai setat API key-ul în Setări.
+
+### 3. Dacă pe Netlify nu merge (date nu se salvează / extensia nu blochează)
+
+- **Verifică build-ul:** în Netlify → **Deploys** → ultimul deploy → **Build log**. Trebuie să vezi `npm install` și fără erori.
+- **Verifică Functions:** în Netlify → **Functions**. Ar trebui să apară `get-data` și `save-data`.
+- **Hard refresh pe site:** Ctrl+Shift+R (sau Cmd+Shift+R pe Mac) pe pagina ta Netlify ca să se încarce ultima versiune a `app.js`.
+- **Extensia Chrome:** reîncarcă extensia din `chrome://extensions/`, apoi reîncarcă pagina Deep Work Depot de pe Netlify și pornește timerul.

@@ -10,15 +10,23 @@ exports.handler = async (event) => {
   } catch (_) {
     return { statusCode: 400, body: "Invalid JSON" };
   }
-  const store = getStore("deep-work-depot");
-  await store.setJSON("data", {
-    days: body.days || {},
-    settings: body.settings || {},
-    activeTimer: body.activeTimer !== undefined ? body.activeTimer : null,
-  });
-  return {
-    statusCode: 200,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ ok: true }),
-  };
+  try {
+    const store = getStore("deep-work-depot");
+    await store.setJSON("data", {
+      days: body.days || {},
+      settings: body.settings || {},
+      activeTimer: body.activeTimer !== undefined ? body.activeTimer : null,
+    });
+    return {
+      statusCode: 200,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ok: true }),
+    };
+  } catch (err) {
+    return {
+      statusCode: 500,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ok: false, error: "save failed" }),
+    };
+  }
 };
