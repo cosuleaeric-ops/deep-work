@@ -491,12 +491,10 @@ istoricModal.addEventListener("cancel", () => istoricModal.close());
 
 btnSettings.addEventListener("click", () => settingsModal.showModal());
 modalClose.addEventListener("click", () => {
-  saveSettings();
-  settingsModal.close();
+  Promise.resolve(saveSettings()).then(() => settingsModal.close());
 });
 settingsModal.addEventListener("cancel", () => {
-  saveSettings();
-  settingsModal.close();
+  Promise.resolve(saveSettings()).then(() => settingsModal.close());
 });
 
 if (btnExport) btnExport.addEventListener("click", exportData);
