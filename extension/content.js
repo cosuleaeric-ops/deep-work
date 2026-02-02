@@ -34,5 +34,5 @@
       });
     });
   }
-  setInterval(check, 1000);
+  setInterval(check, 500);
 })();

@@ -63,7 +63,8 @@ function todayKey() {
 }
 
 function loadDays() {
-  if (useFileStorage || useNetlifyStorage) return memory.days || {};
+  if (useFileStorage) return memory.days || {};
+  if (useNetlifyStorage) return memory.days || {};
   try {
     const raw = localStorage.getItem(STORAGE_DAYS);
     return raw ? JSON.parse(raw) : {};
@@ -80,6 +81,9 @@ function saveDays(days) {
   }
   if (useNetlifyStorage) {
     memory.days = days;
+    try {
+      localStorage.setItem(STORAGE_DAYS, JSON.stringify(days));
+    } catch (_) {}
     netlifySave();
     return;
   }
@@ -540,6 +544,20 @@ async function init() {
       memory.settings = data.settings || {};
       memory.activeTimer = data.activeTimer ?? null;
       useNetlifyStorage = true;
+      try {
+        const raw = localStorage.getItem(STORAGE_DAYS);
+        if (raw) {
+          const localDays = JSON.parse(raw);
+          const merged = { ...memory.days };
+          for (const key of Object.keys(localDays)) {
+            const a = (merged[key] || 0);
+            const b = Number(localDays[key]) || 0;
+            merged[key] = Math.max(a, b);
+          }
+          memory.days = merged;
+          netlifySave();
+        }
+      } catch (_) {}
     }
   } catch (_) {}
   if (!useNetlifyStorage) {
