@@ -549,15 +549,6 @@ async function init() {
   resetDisplay();
   renderLegend();
   renderCalendar();
-  if (useNetlifyStorage && (!memory.settings || typeof memory.settings.workMin !== "number")) {
-    memory.settings = {
-      workMin: workDurationMin,
-      restMin: restDurationMin,
-      userName: (userNameInput && userNameInput.value) ? userNameInput.value.trim() : "eric cosulea",
-      wipApiKey: (wipApiKeyInput && wipApiKeyInput.value) ? wipApiKeyInput.value.trim() : "",
-    };
-    netlifySave();
-  }
   loadActiveTimer();
 }
 init();
