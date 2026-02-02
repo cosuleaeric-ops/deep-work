@@ -307,19 +307,8 @@ body {
   flex-wrap: wrap;
 }
 
-.setting-row-actions .btn-save {
-  background: var(--green-low);
-  color: var(--green);
-  border-color: var(--green-mid);
-}
-
-.setting-row-actions .btn-save:hover {
-  background: var(--green-mid);
-  color: var(--bg);
-}
-
 #modal-close {
-  margin-top: 0;
+  margin-top: 1rem;
 }
 
 /* Reset button – colț */

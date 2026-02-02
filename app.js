@@ -37,7 +37,6 @@ const istoricClose = document.getElementById("istoric-close");
 const settingsModal = document.getElementById("settings-modal");
 const btnSettings = document.getElementById("btn-settings");
 const modalClose = document.getElementById("modal-close");
-const btnSave = document.getElementById("btn-save");
 const workDurationInput = document.getElementById("work-duration");
 const restDurationInput = document.getElementById("rest-duration");
 const userNameInput = document.getElementById("user-name");
@@ -491,17 +490,6 @@ istoricClose.addEventListener("click", () => istoricModal.close());
 istoricModal.addEventListener("cancel", () => istoricModal.close());
 
 btnSettings.addEventListener("click", () => settingsModal.showModal());
-if (btnSave) {
-  btnSave.addEventListener("click", () => {
-    Promise.resolve(saveSettings()).then(() => {
-      settingsModal.close();
-      window.location.reload();
-    }).catch(() => {
-      settingsModal.close();
-      window.location.reload();
-    });
-  });
-}
 modalClose.addEventListener("click", () => {
   saveSettings();
   settingsModal.close();
