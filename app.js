@@ -122,9 +122,29 @@ function applySettings(s) {
 }
 
 function loadSettings() {
-  if (useFileStorage || useNetlifyStorage) {
+  if (useFileStorage) {
     applySettings(memory.settings);
     return;
+  }
+  if (useNetlifyStorage) {
+    if (memory.settings && typeof memory.settings.workMin === "number") {
+      applySettings(memory.settings);
+      return;
+    }
+    try {
+      const raw = localStorage.getItem(STORAGE_SETTINGS);
+      if (raw) {
+        const s = JSON.parse(raw);
+        applySettings(s);
+        memory.settings = s;
+      } else {
+        applySettings(memory.settings);
+      }
+      return;
+    } catch (_) {
+      applySettings(memory.settings);
+      return;
+    }
   }
   try {
     const raw = localStorage.getItem(STORAGE_SETTINGS);
@@ -151,6 +171,9 @@ function saveSettings() {
   }
   if (useNetlifyStorage) {
     memory.settings = settings;
+    try {
+      localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
+    } catch (_) {}
     return netlifySave();
   }
   localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
