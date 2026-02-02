@@ -1,6 +1,6 @@
 # deep work depot
 
-Aplicație locală pentru deep work: timer work/rest și calendar pe lună cu sesiuni.
+Aplicație pentru deep work: timer work/rest și calendar pe lună cu sesiuni. Poate rula local sau fi publicată pe Netlify (static).
 
 ## Stocare date
 
@@ -32,4 +32,30 @@ Fără API key (câmp gol) nu se postează nimic.
 
 ## Cerințe
 
-- Pentru server: **Node.js** instalat pe calculator.
+- Pentru server local: **Node.js** instalat pe calculator.
+
+## GitHub și Netlify
+
+### 1. Pune proiectul pe GitHub
+
+1. Creează un repository nou pe [github.com](https://github.com/new) (ex: `deep-work-depot`), fără README / .gitignore.
+2. În terminal, din folderul proiectului:
+
+```bash
+git remote add origin https://github.com/USERNAME/deep-work-depot.git
+git branch -M main
+git push -u origin main
+```
+
+Înlocuiește `USERNAME` cu username-ul tău GitHub și `deep-work-depot` cu numele repo-ului dacă e diferit.
+
+### 2. Deploy pe Netlify
+
+1. Mergi la [netlify.com](https://www.netlify.com) și autentifică-te (cu GitHub).
+2. **Add new site** → **Import an existing project** → **GitHub** și alege repo-ul `deep-work-depot`.
+3. Setări build:
+   - **Build command:** lasă gol (site static).
+   - **Publish directory:** `.` (sau `/`).
+4. **Deploy site**.
+
+Netlify va servi direct `index.html`, `app.js` și `styles.css`. În browser datele vor fi stocate în **localStorage** (fără server Node). Postarea pe WIP funcționează din browser dacă ai setat API key-ul în Setări.

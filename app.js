@@ -7,12 +7,14 @@
 const STORAGE_DAYS = "deepWorkDepot_days";   // { "YYYY-MM-DD": nr sesiuni }
 const STORAGE_SETTINGS = "deepWorkDepot_settings";
 const STORAGE_ACTIVE_TIMER = "deepWorkDepot_activeTimer"; // { endTimestamp, mode }
+const EXTENSION_BLOCK_FLAG = "deepWorkDepot_timerActive"; // pentru extensia Chrome care blochează site-uri
 
 const DEFAULT_WORK_MIN = 60;
 const DEFAULT_REST_MIN = 5;
 
 let useFileStorage = false;
-let memory = { days: {}, settings: {} };
+let useNetlifyStorage = false;
+let memory = { days: {}, settings: {}, activeTimer: null };
 
 // --- State
 let mode = "work";
@@ -40,6 +42,9 @@ const restDurationInput = document.getElementById("rest-duration");
 const userNameInput = document.getElementById("user-name");
 const wipApiKeyInput = document.getElementById("wip-api-key");
 const btnReset = document.getElementById("btn-reset");
+const btnExport = document.getElementById("btn-export");
+const btnImport = document.getElementById("btn-import");
+const inputImport = document.getElementById("input-import");
 
 // --- Helpers
 function pad(n) {
@@ -58,7 +63,7 @@ function todayKey() {
 }
 
 function loadDays() {
-  if (useFileStorage) return memory.days || {};
+  if (useFileStorage || useNetlifyStorage) return memory.days || {};
   try {
     const raw = localStorage.getItem(STORAGE_DAYS);
     return raw ? JSON.parse(raw) : {};
@@ -73,12 +78,26 @@ function saveDays(days) {
     postData();
     return;
   }
+  if (useNetlifyStorage) {
+    memory.days = days;
+    netlifySave();
+    return;
+  }
   localStorage.setItem(STORAGE_DAYS, JSON.stringify(days));
 }
 
 function postData() {
   if (!useFileStorage) return;
   fetch("/api/data", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ days: memory.days, settings: memory.settings, activeTimer: memory.activeTimer }),
+  }).catch(() => {});
+}
+
+function netlifySave() {
+  if (!useNetlifyStorage) return;
+  fetch("/.netlify/functions/save-data", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ days: memory.days, settings: memory.settings, activeTimer: memory.activeTimer }),
@@ -102,7 +121,7 @@ function applySettings(s) {
 }
 
 function loadSettings() {
-  if (useFileStorage) {
+  if (useFileStorage || useNetlifyStorage) {
     applySettings(memory.settings);
     return;
   }
@@ -130,11 +149,16 @@ function saveSettings() {
     postData();
     return;
   }
+  if (useNetlifyStorage) {
+    memory.settings = settings;
+    netlifySave();
+    return;
+  }
   localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(settings));
 }
 
 function getWipApiKey() {
-  if (useFileStorage) return (memory.settings && memory.settings.wipApiKey) || "";
+  if (useFileStorage || useNetlifyStorage) return (memory.settings && memory.settings.wipApiKey) || "";
   try {
     const raw = localStorage.getItem(STORAGE_SETTINGS);
     const s = raw ? JSON.parse(raw) : {};
@@ -142,6 +166,63 @@ function getWipApiKey() {
   } catch {
     return "";
   }
+}
+
+function exportData() {
+  const days = loadDays();
+  let settings = {};
+  if (useFileStorage || useNetlifyStorage) {
+    settings = memory.settings || {};
+  } else {
+    try {
+      const raw = localStorage.getItem(STORAGE_SETTINGS);
+      settings = raw ? JSON.parse(raw) : {};
+    } catch (_) {}
+  }
+  const data = { days, settings };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "deep-work-depot-backup-" + todayKey() + ".json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importData(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      const importedDays = data.days || {};
+      const importedSettings = data.settings || {};
+      const currentDays = loadDays();
+      const mergedDays = { ...currentDays };
+      for (const key of Object.keys(importedDays)) {
+        const a = (currentDays[key] || 0);
+        const b = Number(importedDays[key]) || 0;
+        mergedDays[key] = Math.max(a, b);
+      }
+      if (useFileStorage) {
+        memory.days = mergedDays;
+        memory.settings = importedSettings;
+        postData();
+      } else if (useNetlifyStorage) {
+        memory.days = mergedDays;
+        memory.settings = importedSettings;
+        netlifySave();
+      } else {
+        localStorage.setItem(STORAGE_DAYS, JSON.stringify(mergedDays));
+        if (Object.keys(importedSettings).length) {
+          localStorage.setItem(STORAGE_SETTINGS, JSON.stringify(importedSettings));
+        }
+      }
+      if (Object.keys(importedSettings).length) applySettings(importedSettings);
+      renderCalendar();
+    } catch (_) {}
+    if (inputImport) inputImport.value = "";
+  };
+  reader.readAsText(file);
 }
 
 function postToWip(body) {
@@ -176,8 +257,21 @@ function saveActiveTimer() {
     postData();
     return;
   }
+  if (useNetlifyStorage) {
+    memory.activeTimer = payload;
+    netlifySave();
+    return;
+  }
   try {
     localStorage.setItem(STORAGE_ACTIVE_TIMER, JSON.stringify(payload));
+  } catch (_) {}
+}
+
+function setExtensionBlockFlag(active) {
+  try {
+    if (active) localStorage.setItem(EXTENSION_BLOCK_FLAG, "1");
+    else localStorage.removeItem(EXTENSION_BLOCK_FLAG);
+    document.dispatchEvent(new CustomEvent("deepWorkDepotTimerChange", { detail: { active } }));
   } catch (_) {}
 }
 
@@ -187,6 +281,11 @@ function clearActiveTimer() {
     postData();
     return;
   }
+  if (useNetlifyStorage) {
+    memory.activeTimer = null;
+    netlifySave();
+    return;
+  }
   try {
     localStorage.removeItem(STORAGE_ACTIVE_TIMER);
   } catch (_) {}
@@ -194,7 +293,7 @@ function clearActiveTimer() {
 
 function loadActiveTimer() {
   let data = null;
-  if (useFileStorage) {
+  if (useFileStorage || useNetlifyStorage) {
     data = memory.activeTimer || null;
   } else {
     try {
@@ -217,6 +316,7 @@ function loadActiveTimer() {
   updateTabTitle();
   btnStart.textContent = "stop";
   intervalId = setInterval(tick, 1000);
+  setExtensionBlockFlag(true);
   return true;
 }
 
@@ -263,6 +363,7 @@ function startTimer() {
   btnStart.textContent = "stop";
   intervalId = setInterval(tick, 1000);
   saveActiveTimer();
+  setExtensionBlockFlag(true);
 }
 
 function stopTimer() {
@@ -270,6 +371,7 @@ function stopTimer() {
     clearInterval(intervalId);
     intervalId = null;
   }
+  setExtensionBlockFlag(false);
   clearActiveTimer();
   btnStart.textContent = "start";
 }
@@ -394,18 +496,39 @@ modalClose.addEventListener("click", () => {
 });
 settingsModal.addEventListener("cancel", () => settingsModal.close());
 
-// --- Init: dacă suntem pe server, încarcă din fișier; altfel localStorage
+if (btnExport) btnExport.addEventListener("click", exportData);
+if (btnImport && inputImport) {
+  btnImport.addEventListener("click", () => inputImport.click());
+  inputImport.addEventListener("change", () => {
+    const file = inputImport.files && inputImport.files[0];
+    importData(file);
+  });
+}
+
+// --- Init: Netlify Blobs → server local → localStorage
 async function init() {
   try {
-    const r = await fetch("/api/data");
-    if (r.ok) {
-      const data = await r.json();
+    const netlifyR = await fetch("/.netlify/functions/get-data");
+    if (netlifyR.ok) {
+      const data = await netlifyR.json();
       memory.days = data.days || {};
       memory.settings = data.settings || {};
-      memory.activeTimer = data.activeTimer || null;
-      useFileStorage = true;
+      memory.activeTimer = data.activeTimer ?? null;
+      useNetlifyStorage = true;
     }
   } catch (_) {}
+  if (!useNetlifyStorage) {
+    try {
+      const r = await fetch("/api/data");
+      if (r.ok) {
+        const data = await r.json();
+        memory.days = data.days || {};
+        memory.settings = data.settings || {};
+        memory.activeTimer = data.activeTimer ?? null;
+        useFileStorage = true;
+      }
+    } catch (_) {}
+  }
   loadSettings();
   resetDisplay();
   renderLegend();

@@ -1,0 +1,9 @@
+{
+  "name": "deep-work-depot",
+  "version": "1.0.0",
+  "description": "Timer deep work + calendar",
+  "private": true,
+  "dependencies": {
+    "@netlify/blobs": "^4.0.0"
+  }
+}

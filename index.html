@@ -6,7 +6,7 @@
   <title>deep work depot</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body data-app="deep-work-depot">
   <header class="header">
     <h1 class="title">deep work depot</h1>
     <div class="header-actions">
@@ -63,6 +63,11 @@
       <div class="setting-row">
         <label for="wip-api-key">WIP API key (opțional – postează pe wip.co la fiecare sesiune):</label>
         <input type="password" id="wip-api-key" placeholder="lăsat gol = fără postare WIP" autocomplete="off" />
+      </div>
+      <div class="setting-row setting-row-actions">
+        <button type="button" class="btn btn-ghost" id="btn-export">Export date</button>
+        <button type="button" class="btn btn-ghost" id="btn-import">Import date</button>
+        <input type="file" id="input-import" accept=".json,application/json" hidden />
       </div>
       <button type="button" class="btn btn-ghost" id="modal-close">Închide</button>
     </div>

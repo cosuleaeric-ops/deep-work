@@ -1,0 +1,38 @@
+(function () {
+  const FLAG_KEY = "deepWorkDepot_timerActive";
+
+  function readFlag() {
+    try {
+      return localStorage.getItem(FLAG_KEY) === "1";
+    } catch (_) {
+      return false;
+    }
+  }
+
+  function sendToBackground(active) {
+    if (typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.id) {
+      chrome.runtime.sendMessage({ type: "DEEP_WORK_ACTIVE", active }, () => {});
+    }
+  }
+
+  function check() {
+    if (document.body && document.body.getAttribute("data-app") === "deep-work-depot") {
+      sendToBackground(readFlag());
+    }
+  }
+
+  if (document.body) {
+    check();
+    document.addEventListener("deepWorkDepotTimerChange", function (e) {
+      if (e.detail && typeof e.detail.active === "boolean") sendToBackground(e.detail.active);
+    });
+  } else {
+    document.addEventListener("DOMContentLoaded", function () {
+      check();
+      document.addEventListener("deepWorkDepotTimerChange", function (e) {
+        if (e.detail && typeof e.detail.active === "boolean") sendToBackground(e.detail.active);
+      });
+    });
+  }
+  setInterval(check, 1000);
+})();
