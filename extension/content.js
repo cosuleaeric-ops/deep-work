@@ -1,5 +1,5 @@
 (function () {
-  const FLAG_KEY = "deepWorkDepot_timerActive";
+  const FLAG_KEY = "eliteDeepWork_timerActive";
 
   function readFlag() {
     try {
@@ -16,20 +16,20 @@
   }
 
   function check() {
-    if (document.body && document.body.getAttribute("data-app") === "deep-work-depot") {
+    if (document.body && document.body.getAttribute("data-app") === "elite-deep-work") {
       sendToBackground(readFlag());
     }
   }
 
   if (document.body) {
     check();
-    document.addEventListener("deepWorkDepotTimerChange", function (e) {
+    document.addEventListener("eliteDeepWorkTimerChange", function (e) {
       if (e.detail && typeof e.detail.active === "boolean") sendToBackground(e.detail.active);
     });
   } else {
     document.addEventListener("DOMContentLoaded", function () {
       check();
-      document.addEventListener("deepWorkDepotTimerChange", function (e) {
+      document.addEventListener("eliteDeepWorkTimerChange", function (e) {
         if (e.detail && typeof e.detail.active === "boolean") sendToBackground(e.detail.active);
       });
     });

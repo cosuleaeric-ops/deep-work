@@ -1,14 +1,14 @@
-# Deep Work Depot – extensie Chrome
+# Elite Deep Work – extensie Chrome
 
-Blochează **Facebook, X (Twitter), Reddit, Instagram** și **LinkedIn** cât timp timerul de deep work rulează în aplicația Deep Work Depot.
+Blochează **Facebook, X (Twitter), Reddit, Instagram, LinkedIn** și **TikTok** cât timp timerul de deep work rulează în aplicația Elite Deep Work.
 
 ## Cum funcționează
 
-1. Când pornești timerul (work sau rest) în Deep Work Depot, aplicația setează un indicator în browser.
-2. Extensia citește acest indicator (când ai tab-ul cu Deep Work Depot deschis) și activează blocarea.
-3. Încercări de acces la Facebook, X, Reddit, Instagram sau LinkedIn sunt blocate până oprești timerul.
+1. Când pornești timerul (work sau rest) în Elite Deep Work, aplicația setează un indicator în browser.
+2. Extensia citește acest indicator (când ai tab-ul cu Elite Deep Work deschis) și activează blocarea.
+3. Încercări de acces la Facebook, X, Reddit, Instagram, LinkedIn sau TikTok sunt blocate până oprești timerul.
 
-Blocarea rămâne activă și după ce închizi tab-ul cu Deep Work Depot, până când deschizi din nou aplicația și oprești timerul (sau acesta se termină).
+Blocarea rămâne activă și după ce închizi tab-ul cu Elite Deep Work, până când deschizi din nou aplicația și oprești timerul (sau acesta se termină).
 
 ## Instalare (Chrome)
 
@@ -26,5 +26,6 @@ După instalare, extensia va bloca site-urile de mai sus doar când timerul de d
 - reddit.com
 - instagram.com
 - linkedin.com
+- tiktok.com
 
 Poți modifica lista în `background.js` (tab-ul BLOCK_RULES) dacă vrei să adaugi sau să scoți domenii.

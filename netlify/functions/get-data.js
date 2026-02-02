@@ -4,7 +4,7 @@ const DEFAULT_PAYLOAD = { days: {}, settings: {}, activeTimer: null };
 
 exports.handler = async () => {
   try {
-    const store = getStore("deep-work-depot");
+    const store = getStore("elite-deep-work");
     const data = await store.get("data", { type: "json" });
     const payload = data || DEFAULT_PAYLOAD;
     return {

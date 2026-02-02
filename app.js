@@ -1,13 +1,13 @@
 /**
- * deep work depot – timer + calendar deep work (local, fără login)
+ * elite deep work – timer + calendar deep work (local, fără login)
  * Când rulezi prin server (node server.js): datele se salvează în data.json pe disc.
  * Când deschizi direct index.html: datele rămân în localStorage.
  */
 
-const STORAGE_DAYS = "deepWorkDepot_days";   // { "YYYY-MM-DD": nr sesiuni }
-const STORAGE_SETTINGS = "deepWorkDepot_settings";
-const STORAGE_ACTIVE_TIMER = "deepWorkDepot_activeTimer"; // { endTimestamp, mode }
-const EXTENSION_BLOCK_FLAG = "deepWorkDepot_timerActive"; // pentru extensia Chrome care blochează site-uri
+const STORAGE_DAYS = "eliteDeepWork_days";   // { "YYYY-MM-DD": nr sesiuni }
+const STORAGE_SETTINGS = "eliteDeepWork_settings";
+const STORAGE_ACTIVE_TIMER = "eliteDeepWork_activeTimer"; // { endTimestamp, mode }
+const EXTENSION_BLOCK_FLAG = "eliteDeepWork_timerActive"; // pentru extensia Chrome care blochează site-uri
 
 const DEFAULT_WORK_MIN = 60;
 const DEFAULT_REST_MIN = 5;
@@ -37,6 +37,7 @@ const istoricClose = document.getElementById("istoric-close");
 const settingsModal = document.getElementById("settings-modal");
 const btnSettings = document.getElementById("btn-settings");
 const modalClose = document.getElementById("modal-close");
+const btnSave = document.getElementById("btn-save");
 const workDurationInput = document.getElementById("work-duration");
 const restDurationInput = document.getElementById("rest-duration");
 const userNameInput = document.getElementById("user-name");
@@ -184,7 +185,7 @@ function exportData() {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
-  a.download = "deep-work-depot-backup-" + todayKey() + ".json";
+  a.download = "elite-deep-work-backup-" + todayKey() + ".json";
   a.click();
   URL.revokeObjectURL(a.href);
 }
@@ -272,7 +273,7 @@ function setExtensionBlockFlag(active) {
   try {
     if (active) localStorage.setItem(EXTENSION_BLOCK_FLAG, "1");
     else localStorage.removeItem(EXTENSION_BLOCK_FLAG);
-    document.dispatchEvent(new CustomEvent("deepWorkDepotTimerChange", { detail: { active } }));
+    document.dispatchEvent(new CustomEvent("eliteDeepWorkTimerChange", { detail: { active } }));
   } catch (_) {}
 }
 
@@ -321,7 +322,7 @@ function loadActiveTimer() {
   return true;
 }
 
-const TAB_TITLE_BASE = "deep work depot";
+const TAB_TITLE_BASE = "elite deep work";
 function updateTabTitle() {
   document.title = formatTime(remainingSeconds) + " – " + TAB_TITLE_BASE;
 }
@@ -491,11 +492,21 @@ istoricClose.addEventListener("click", () => istoricModal.close());
 istoricModal.addEventListener("cancel", () => istoricModal.close());
 
 btnSettings.addEventListener("click", () => settingsModal.showModal());
+if (btnSave) {
+  btnSave.addEventListener("click", () => {
+    saveSettings();
+    settingsModal.close();
+    window.location.reload();
+  });
+}
 modalClose.addEventListener("click", () => {
   saveSettings();
   settingsModal.close();
 });
-settingsModal.addEventListener("cancel", () => settingsModal.close());
+settingsModal.addEventListener("cancel", () => {
+  saveSettings();
+  settingsModal.close();
+});
 
 if (btnExport) btnExport.addEventListener("click", exportData);
 if (btnImport && inputImport) {
@@ -535,6 +546,15 @@ async function init() {
   resetDisplay();
   renderLegend();
   renderCalendar();
+  if (useNetlifyStorage && (!memory.settings || typeof memory.settings.workMin !== "number")) {
+    memory.settings = {
+      workMin: workDurationMin,
+      restMin: restDurationMin,
+      userName: (userNameInput && userNameInput.value) ? userNameInput.value.trim() : "eric cosulea",
+      wipApiKey: (wipApiKeyInput && wipApiKeyInput.value) ? wipApiKeyInput.value.trim() : "",
+    };
+    netlifySave();
+  }
   loadActiveTimer();
 }
 init();

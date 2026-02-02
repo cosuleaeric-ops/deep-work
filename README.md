@@ -1,4 +1,4 @@
-# deep work depot
+# elite deep work
 
 Aplicație pentru deep work: timer work/rest și calendar pe lună cu sesiuni. Poate rula local sau fi publicată pe Netlify (static).
 
@@ -38,16 +38,16 @@ Fără API key (câmp gol) nu se postează nimic.
 
 ### 1. Pune proiectul pe GitHub
 
-1. Creează un repository nou pe [github.com](https://github.com/new) (ex: `deep-work-depot`), fără README / .gitignore.
+1. Creează un repository nou pe [github.com](https://github.com/new) (ex: `elite-deep-work`), fără README / .gitignore.
 2. În terminal, din folderul proiectului:
 
 ```bash
-git remote add origin https://github.com/USERNAME/deep-work-depot.git
+git remote add origin https://github.com/USERNAME/elite-deep-work.git
 git branch -M main
 git push -u origin main
 ```
 
-Înlocuiește `USERNAME` cu username-ul tău GitHub și `deep-work-depot` cu numele repo-ului dacă e diferit.
+Înlocuiește `USERNAME` cu username-ul tău GitHub și `elite-deep-work` cu numele repo-ului dacă e diferit.
 
 ### 2. Deploy pe Netlify
 
@@ -65,4 +65,4 @@ Pe Netlify, datele se salvează în **Netlify Blobs** (persistente chiar dacă �
 - **Verifică build-ul:** în Netlify → **Deploys** → ultimul deploy → **Build log**. Trebuie să vezi `npm install` și fără erori.
 - **Verifică Functions:** în Netlify → **Functions**. Ar trebui să apară `get-data` și `save-data`.
 - **Hard refresh pe site:** Ctrl+Shift+R (sau Cmd+Shift+R pe Mac) pe pagina ta Netlify ca să se încarce ultima versiune a `app.js`.
-- **Extensia Chrome:** reîncarcă extensia din `chrome://extensions/`, apoi reîncarcă pagina Deep Work Depot de pe Netlify și pornește timerul.
+- **Extensia Chrome:** reîncarcă extensia din `chrome://extensions/`, apoi reîncarcă pagina Elite Deep Work de pe Netlify și pornește timerul.

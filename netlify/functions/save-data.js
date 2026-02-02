@@ -11,7 +11,7 @@ exports.handler = async (event) => {
     return { statusCode: 400, body: "Invalid JSON" };
   }
   try {
-    const store = getStore("deep-work-depot");
+    const store = getStore("elite-deep-work");
     await store.setJSON("data", {
       days: body.days || {},
       settings: body.settings || {},

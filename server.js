@@ -1,5 +1,5 @@
 /**
- * Server local pentru deep work depot.
+ * Server local pentru elite deep work.
  * Servește aplicația și salvează datele în data.json pe disc.
  * Rulează: node server.js
  * Deschide: http://localhost:3847
@@ -144,7 +144,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log("deep work depot – server local");
+  console.log("elite deep work – server local");
   console.log("  Deschide în browser: http://localhost:" + PORT);
   console.log("  Date salvate în: " + DATA_FILE);
 });

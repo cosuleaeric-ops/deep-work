@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Deep Work Depot – Block social",
+  "name": "Elite Deep Work – Block social",
   "version": "1.1.0",
   "description": "Blochează Facebook, X, Reddit, Instagram și LinkedIn cât timp timerul de deep work rulează.",
   "permissions": ["storage", "declarativeNetRequest"],
