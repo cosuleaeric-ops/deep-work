@@ -76,6 +76,9 @@ function loadDays() {
 function saveDays(days) {
   if (useFileStorage) {
     memory.days = days;
+    try {
+      localStorage.setItem(STORAGE_DAYS, JSON.stringify(days));
+    } catch (_) {}
     postData();
     return;
   }
@@ -87,7 +90,9 @@ function saveDays(days) {
     netlifySave();
     return;
   }
-  localStorage.setItem(STORAGE_DAYS, JSON.stringify(days));
+  try {
+    localStorage.setItem(STORAGE_DAYS, JSON.stringify(days));
+  } catch (_) {}
 }
 
 function postData() {
@@ -540,22 +545,25 @@ async function init() {
     const netlifyR = await fetch(netlifyUrl);
     if (netlifyR.ok) {
       const data = await netlifyR.json();
-      memory.days = data.days || {};
-      memory.settings = data.settings || {};
+      memory.days = data.days && typeof data.days === "object" ? data.days : {};
+      memory.settings = data.settings && typeof data.settings === "object" ? data.settings : {};
       memory.activeTimer = data.activeTimer ?? null;
       useNetlifyStorage = true;
+      // Mereu unifică cu localStorage ca backup (și pentru când blob e gol)
       try {
         const raw = localStorage.getItem(STORAGE_DAYS);
         if (raw) {
           const localDays = JSON.parse(raw);
-          const merged = { ...memory.days };
-          for (const key of Object.keys(localDays)) {
-            const a = (merged[key] || 0);
-            const b = Number(localDays[key]) || 0;
-            merged[key] = Math.max(a, b);
+          if (localDays && typeof localDays === "object") {
+            const merged = { ...memory.days };
+            for (const key of Object.keys(localDays)) {
+              const a = (merged[key] || 0);
+              const b = Number(localDays[key]) || 0;
+              merged[key] = Math.max(a, b);
+            }
+            memory.days = merged;
+            netlifySave();
           }
-          memory.days = merged;
-          netlifySave();
         }
       } catch (_) {}
     }
@@ -569,6 +577,23 @@ async function init() {
         memory.settings = data.settings || {};
         memory.activeTimer = data.activeTimer ?? null;
         useFileStorage = true;
+        // Backup: dacă serverul nu are zile, încarcă din localStorage și sincronizează
+        try {
+          const raw = localStorage.getItem(STORAGE_DAYS);
+          if (raw) {
+            const localDays = JSON.parse(raw);
+            const merged = { ...memory.days };
+            for (const key of Object.keys(localDays)) {
+              const a = (merged[key] || 0);
+              const b = Number(localDays[key]) || 0;
+              merged[key] = Math.max(a, b);
+            }
+            if (Object.keys(merged).length > Object.keys(memory.days).length) {
+              memory.days = merged;
+              postData();
+            }
+          }
+        } catch (_) {}
       }
     } catch (_) {}
   }
