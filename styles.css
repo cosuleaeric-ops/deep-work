@@ -192,15 +192,15 @@ body {
 .calendar-cell[data-level="4"] { background: var(--calendar-4); }
 .calendar-cell[data-level="5"] { background: var(--calendar-5); }
 
-/* Paletă: 0=gri, 1=roșu, 2=roșu2, 3=verde, 4=verde2, 5=verde3 (nr sesiuni în zi) */
+/* Paletă: 0=gri, 1–5=verde pal → verde intens (strict crescător, trepte bine diferențiate) */
 .calendar-cell,
 .legend-cell {
   --calendar-0: #161b22;
-  --calendar-1: #3d1f1f;
-  --calendar-2: #861003;
-  --calendar-3: #0e4429;
-  --calendar-4: #26a641;
-  --calendar-5: #39d353;
+  --calendar-1: #b8f0c0;
+  --calendar-2: #8ae28f;
+  --calendar-3: #5cd36a;
+  --calendar-4: #40c652;
+  --calendar-5: #238636;
 }
 
 .legend {

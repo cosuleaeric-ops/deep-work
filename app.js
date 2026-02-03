@@ -7,7 +7,8 @@
 const STORAGE_DAYS = "eliteDeepWork_days";   // { "YYYY-MM-DD": nr sesiuni }
 const STORAGE_SETTINGS = "eliteDeepWork_settings";
 const STORAGE_ACTIVE_TIMER = "eliteDeepWork_activeTimer"; // { endTimestamp, mode }
-const EXTENSION_BLOCK_FLAG = "eliteDeepWork_timerActive"; // pentru extensia Chrome care blochează site-uri
+const EXTENSION_BLOCK_FLAG = "eliteDeepWork_timerActive"; // pentru extensia Chrome
+const EXTENSION_BLOCK_MODE = "eliteDeepWork_timerMode";   // "work" = blochează social, "rest" = permite
 
 const DEFAULT_WORK_MIN = 60;
 const DEFAULT_REST_MIN = 5;
@@ -299,11 +300,16 @@ function saveActiveTimer() {
   } catch (_) {}
 }
 
-function setExtensionBlockFlag(active) {
+function setExtensionBlockFlag(active, currentMode) {
   try {
-    if (active) localStorage.setItem(EXTENSION_BLOCK_FLAG, "1");
-    else localStorage.removeItem(EXTENSION_BLOCK_FLAG);
-    document.dispatchEvent(new CustomEvent("eliteDeepWorkTimerChange", { detail: { active } }));
+    if (active) {
+      localStorage.setItem(EXTENSION_BLOCK_FLAG, "1");
+      localStorage.setItem(EXTENSION_BLOCK_MODE, currentMode === "rest" ? "rest" : "work");
+    } else {
+      localStorage.removeItem(EXTENSION_BLOCK_FLAG);
+      localStorage.removeItem(EXTENSION_BLOCK_MODE);
+    }
+    document.dispatchEvent(new CustomEvent("eliteDeepWorkTimerChange", { detail: { active, mode: active ? (currentMode === "rest" ? "rest" : "work") : null } }));
   } catch (_) {}
 }
 
@@ -348,7 +354,7 @@ function loadActiveTimer() {
   updateTabTitle();
   btnStart.textContent = "stop";
   intervalId = setInterval(tick, 1000);
-  setExtensionBlockFlag(true);
+  setExtensionBlockFlag(true, mode);
   return true;
 }
 
@@ -395,7 +401,7 @@ function startTimer() {
   btnStart.textContent = "stop";
   intervalId = setInterval(tick, 1000);
   saveActiveTimer();
-  setExtensionBlockFlag(true);
+  setExtensionBlockFlag(true, mode);
 }
 
 function stopTimer() {
