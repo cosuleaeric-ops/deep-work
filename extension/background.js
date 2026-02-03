@@ -1,4 +1,4 @@
-const BLOCK_RULE_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+const BLOCK_RULE_IDS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 const BLOCK_RULES = [
   { id: 1, priority: 1, action: { type: "block" }, condition: { urlFilter: "||facebook.com", resourceTypes: ["main_frame"] } },
   { id: 2, priority: 1, action: { type: "block" }, condition: { urlFilter: "||twitter.com", resourceTypes: ["main_frame"] } },
@@ -11,6 +11,7 @@ const BLOCK_RULES = [
   { id: 9, priority: 2, action: { type: "block" }, condition: { regexFilter: "^https?://([^/]*\\.)?(twitter\\.com|x\\.com)(/.*)?$", resourceTypes: ["main_frame"] } },
   { id: 10, priority: 2, action: { type: "block" }, condition: { urlFilter: "|https://x.com", resourceTypes: ["main_frame"] } },
   { id: 11, priority: 2, action: { type: "block" }, condition: { urlFilter: "|https://twitter.com", resourceTypes: ["main_frame"] } },
+  { id: 12, priority: 2, action: { type: "block" }, condition: { urlFilter: "|https://x.com/home", resourceTypes: ["main_frame"] } },
 ];
 
 async function applyBlocking(active) {
